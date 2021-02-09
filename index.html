@@ -1,0 +1,138 @@
+    <!DOCTYPE html>
+    <html>
+    <head>
+        
+        <style>
+            
+            body {
+                padding:0;
+                margin:0;
+                overflow: hidden;
+            }
+            
+        </style>
+    </head>
+    
+    
+    <body>
+        
+        <canvas></canvas>
+        
+    </body>
+    <script>
+        'use strict';
+        
+        
+        let canvas = document.querySelector('canvas');
+        canvas.style.backgroundColor = 'rgba(0, 0, 155, 0.2)';
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        let c = canvas.getContext('2d')
+        
+        window.addEventListener('mousemove', mouseMove)
+        let mCoord = {
+            x:null,
+            y:null
+        }
+        function mouseMove (e) {
+            mCoord.x = e.x
+            mCoord.y = e.y 
+        }
+        
+        window.addEventListener('resize', changeWindow)
+        
+        function changeWindow() {
+            
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            createBalls ()
+        }
+        
+        
+        
+        class Balls {
+            
+            constructor (x, y, rad, color, dx, dy) {
+                this.x = x;
+                this.y = y;
+                this.rad = rad;
+                this.color = color;
+                this.dx = dx;
+                this.dy = dy;
+                this.startRad = this.rad;
+            }
+            
+            draw() {
+                c.beginPath()
+                c.arc(this.x, this.y, this.rad, 0, Math.PI*2, false)
+                c.strokeStyle = 'black'
+                c.fillStyle = this.color
+                c.fill()
+                c.stroke()
+            }
+            
+            update() {
+                this.draw()
+                if (this.x + this.dx + this.rad > window.innerWidth || this.x + this.dx - this.rad < 0) {
+                    this.dx = -this.dx;
+                } else {
+                    this.x+=this.dx
+                }
+                if (this.y + this.dy + this.rad > window.innerHeight || this.y + this.dy - this.rad < 0) {
+                    this.dy = -this.dy;
+                } else {
+                    this.y+=this.dy
+                }
+                
+                
+                
+                if (mCoord.x - this.x < 50 && mCoord.x - this.x > -50 && mCoord.y - this.y < 50 && mCoord.y - this.y > -50 && this.rad < this.startRad+40)
+                this.rad+=1;
+                else if (this.rad > this.startRad) this.rad-=1; 
+            }
+            
+            
+        }
+        
+        
+        
+        
+        let arr = [];
+        
+        function createBalls () {
+            arr = [];
+            for (let  i = 0; i < 500; i++) {
+                let rad = Math.random() * 30 + 2
+                let x = Math.random() * window.innerWidth
+                if (x < rad) x+= rad
+                else if (x>window.innerWidth-rad) x-=rad
+                let y = Math.random() * window.innerHeight 
+                if (y < rad) y+= rad
+                else if (y>window.innerHeight-rad) y-=rad
+                let color1 = Math.random() * 255
+                let color2 = Math.random() * 255
+                let color3 = Math.random() * 255
+                let opac = (Math.random()+0.3) * 1
+                let dx = (Math.random()-0.5) * 2
+                let dy = (Math.random()-0.5) * 2
+                let color = `rgba(${color1},${color2},${color3},${opac})`
+                arr.push(new Balls(x, y, rad, color, dx, dy))
+            }
+            
+        }
+        createBalls ()
+        
+        function animate () {
+            c.clearRect(0,0, window.innerWidth, window.innerHeight)
+            requestAnimationFrame(animate)
+            arr.map(x=>x.update())
+        } 
+        animate ()
+        
+        
+        
+        
+        
+    </script>
+    </html>
